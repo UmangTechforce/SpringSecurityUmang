@@ -1,8 +1,11 @@
 package com.security.demo.controller;
 
 import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,10 +36,17 @@ public class UserController {
 
 		return userService.authenticateUser(user);
 	}
-	
+
 	@GetMapping("/list")
-	public List<User> getUsers(){
-		
+	public List<User> getUsers() {
+
 		return userService.getUsers();
+	}
+
+	@GetMapping("/details")
+	public ResponseEntity<Object> getUser(Principal principal) {
+
+		User user = userService.getUser(principal);
+		return new ResponseEntity<>(user, HttpStatus.ACCEPTED);
 	}
 }

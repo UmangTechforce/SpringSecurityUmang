@@ -1,13 +1,11 @@
 package com.security.demo.service;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,7 +21,14 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class JwtSetting {
-
+		
+	
+	
+	
+//	public static final String SECURITY_KEY= "3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b";	
+	public static final String SECURITY_KEY= "cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b";	
+	
+	
 	// Method to generate Jwt token
 	public String generateToken(String email) throws InvalidKeyException, NoSuchAlgorithmException {
 		Map<String, Object> claims = new HashMap<>();
@@ -33,26 +38,15 @@ public class JwtSetting {
 				.add(claims)
 				.subject(email)
 				.issuedAt(new Date(System.currentTimeMillis()))
-				.expiration(new Date(System.currentTimeMillis() + 60 * 60 * 30000)).and().signWith(getKey()).compact();
+				.expiration(new Date(System.currentTimeMillis() + 60 * 60 * 30000)).and()
+				.signWith(getKey())
+				.compact();
 	}
 
 	// Method to generate key for Jwt token
 	private SecretKey getKey() {
-		KeyGenerator keyGenerator;
-		try {
-			
-			log.info("In "+this+" generate token method");
-			
-			keyGenerator = KeyGenerator.getInstance("HmacSHA256");
-			SecretKey secretKey = keyGenerator.generateKey();
-			String key = Base64.getEncoder().encodeToString(secretKey.getEncoded());
-			byte[] byteArrayOfKey = Decoders.BASE64.decode(key);
-			return Keys.hmacShaKeyFor(byteArrayOfKey);
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-
-			throw new RuntimeException("Key did not generate");
-		}
+		byte[] keyBytes = Decoders.BASE64.decode(SECURITY_KEY);
+        return Keys.hmacShaKeyFor(keyBytes);
 
 	}
 
@@ -65,6 +59,7 @@ public class JwtSetting {
 		 * be called getUserName()
 		 */
 		final String userName = getUserName(token);// -->1
+		
 		log.info("In "+this+" validateToken() method with name "+userName);
 		
 		return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));

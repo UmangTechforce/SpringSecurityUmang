@@ -7,7 +7,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -20,12 +19,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 
-	private final UserDetailsService userDetailsService;
+
 
 	private final JwtSetting jwtSetting;
 
@@ -38,7 +39,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
 		// Calls private method to get a valid JWT tokens
 		String token = getToken(request);
-
+		
+		log.info("The main token from filter "+token);
 		if (StringUtils.hasText(token) && SecurityContextHolder.getContext().getAuthentication() == null) {
 			// Logic to get User email and set authentication
 
@@ -46,12 +48,12 @@ public class JwtFilter extends OncePerRequestFilter {
 			UserDetails userDetails = context.getBean(UserDetailServiceImpl.class).loadUserByUsername(username);
 
 			// Getting user deatils from the username in the token
-
+			
 			if (jwtSetting.validateToken(token, userDetails)) {
 
 				// Setting the auth token in the context
 				UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
-						userDetails.getAuthorities());
+						null,userDetails.getAuthorities());
 				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				SecurityContextHolder.getContext().setAuthentication(authToken);
 			}
@@ -68,6 +70,9 @@ public class JwtFilter extends OncePerRequestFilter {
 		// Checking the Token from header if it hase 'Bearer ' in the begining
 
 		if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
+			
+			
+			
 			return token.substring(7, token.length());
 
 		}

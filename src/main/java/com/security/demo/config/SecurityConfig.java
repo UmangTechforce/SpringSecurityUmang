@@ -30,7 +30,9 @@ public class SecurityConfig {
 
 		httpSecurity.csrf(Customizer -> Customizer.disable());
 		httpSecurity.authorizeHttpRequests(Request-> Request
-				.requestMatchers("user", "/user/login/**")
+			//	.requestMatchers("admin/**").hasAnyRole(Role.ADMIN.toString())
+				.requestMatchers("admin/**").hasAnyRole("EMP","ADMIN")
+				.requestMatchers("user", "/user/login/**","v3/**","swagger-ui/**")
 				.permitAll()
 				.anyRequest().authenticated());
 //		httpSecurity.formLogin(Customizer.withDefaults());

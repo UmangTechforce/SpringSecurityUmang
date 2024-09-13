@@ -1,5 +1,9 @@
 package com.security.demo.entity;
 
+import java.util.Set;
+
+import com.security.demo.constant.Role;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,5 +27,7 @@ public class User {
 	private String password;
 	
 	private String email;
+	
+	private Set<Role> roles;
 	
 }
